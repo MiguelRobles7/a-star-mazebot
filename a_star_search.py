@@ -1,154 +1,124 @@
 import queue
+from enum import Enum
+class TileType(Enum):
+	WALL = 0
+	EMPTY = 1
+	START = 2
+	END = 3
 # to keep track of the blocks of maze
-class Grid_Position:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-# each block will have its own position and cost of steps taken
-class Node:
-    def __init__(self, pos: Grid_Position, cost):
-        self.pos = pos
-        self.cost = cost
-
-    def __lt__(self, other):
-        if self.cost < other.cost:
-            return True
-        else:
-            return False
+class Point:
+	def __init__(self, x, y):
+		self.x = x
+		self.y = y
+	def __lt__(self, _): #to fix issues on pq
+		return False
 
 def manhattan_distance(curr_node,dest):
-    return (abs(curr_node.x-dest.x)+abs(curr_node.y-dest.y))
+	return (abs(curr_node.x-dest.x)+abs(curr_node.y-dest.y))
 
-def A_Star(maze, end, start, size):
-    # Create lists for open nodes and closed nodes
-    pq = queue.PriorityQueue() #I'm not sure if we can use this but makes life much easier, we can ask sir, if not we can manually sort the list
-    closed = [[False for i in range(size)]
-                      for j in range(size)] # all in the closed list are unexplored for now
-    closed[start.x][start.y] = True # start node is explored
+def getValidMoves(maze, point):
+	size_x, size_y = len(maze), len(maze[0])
+	validMoves = []
+	for offset in [(1,0),(0,1),(-1,0),(0,-1)]:
+		x, y = point.x + offset[0], point.y + offset[1]
+		if x < 0 or y < 0 or x >= size_x or y >= size_y:
+			continue
+		if maze[x][y] != TileType.WALL:
+			validMoves.append(Point(x, y))
+	return validMoves
 
-    indexes = [(start.x, start.y)]
-    # will be used to get neighbors 
-    adj_cell_x = [-1, 0, 0, 1]
-    adj_cell_y = [0, -1, 1, 0]
+def A_Star(maze, end, start):
 
-    # Create a start node and an goal node
-    Start = Node(start, 0)
+	size_x, size_y = len(maze), len(maze[0]) #size of maze
+	pq = queue.PriorityQueue() # holds (priority, point)
+	order = [(start.x, start.y)] #the order in which states are explored
 
-    # Add the start node
-    pq.put((0, Start))
-    cost = 0
-    cells = 4
+	costs = [[-1 for _ in range(size_y)] #so that the optimal path can be traced back
+				for _ in range(size_x)] # from end to start and to check if state is explored
+	costs[start.x][start.y] = 0
 
-    # Loop until the open list is empty
-    while pq:
-    # Sort the open list to get the node with the lowest cost first
-        # for now since using priority queue we don't need to sort manually
+	pq.put((0, start))
+	while not pq.empty():
+		curr = pq.get()[1]
+		if curr.x == end.x and curr.y == end.y:
+			break
+		parent_cost = costs[curr.x][curr.y]
+		for child in getValidMoves(maze, curr):
+			x, y = child.x, child.y
+			if costs[x][y] != -1:
+				continue
 
-    # Get the node with the lowest cost
-        current = pq.get() # priority queue automatically gets lowest cost node 
-        current_node = current[1] 
-        current_pos = current_node.pos
+			costs[x][y] = parent_cost + 1 #the cost of each action is 1
+			order.append((x, y))
 
-    # Add the current node to the closed list
-        if current_node not in closed:
-            closed[current_pos.x][current_pos.y] = True
-            cost = cost + 1
+			pq.put((costs[x][y] + manhattan_distance(child, end), child))
+	return costs, order
 
-    # Check if we have reached the goal, return the path if we have
-        if current_pos.x == end.x and current_pos.y == end.y:
-            print("Algorithm used = A* Algorithm")
-            print("No. of moves utilized = ", cost)
-            return indexes
 
-        x_pos = current_pos.x
-        y_pos = current_pos.y
-
-    # If not, we get neighbours 
-        for i in range(cells):
-            if x_pos == len(maze) - 1 and adj_cell_x[i] == 1:
-                x_pos = current_pos.x
-                y_pos = current_pos.y + adj_cell_y[i]
-            if y_pos == 0 and adj_cell_y[i] == -1:
-                x_pos = current_pos.x + adj_cell_x[i]
-                y_pos = current_pos.y
-            else:
-                x_pos = current_pos.x + adj_cell_x[i]
-                y_pos = current_pos.y + adj_cell_y[i]
-            if x_pos < size and y_pos < size and x_pos >= 0 and y_pos >= 0:
-                if maze[x_pos][y_pos] == 1:
-                    if not closed[x_pos][y_pos]:
-                        neighbor = Node(Grid_Position(x_pos, y_pos), current_node.cost + 1)
-                        h = manhattan_distance(neighbor.pos, end) #get heuristic value of neighbours
-                        f = h + neighbor.cost #getting f by f = h + g
-                        closed[x_pos][y_pos] = True #adding neighbour to closed
-                        pq.put((f, neighbor))
-                        indexes.append((x_pos, y_pos))
-
-    return -1
 def printMaze(maze):
-    for i in maze:
-        for a in i:
-            print(a, end=" ")
-        print()
-
+	for i in maze:
+		for a in i:
+			print(a.value, end=" ")
+		print()
+def initMaze(fname):
+	maze = []
+	file = open(fname, 'r')
+	file.readline().split()[0]
+	types = {
+		'#': TileType.WALL,
+		'.': TileType.EMPTY,
+		'S': TileType.START,
+		'G': TileType.END
+	}
+	for row in file.read().split('\n'):
+		maze.append(list(map(lambda c: types[c], row)))
+	# look for the beginning position
+	(start_x, start_y) = [
+		[(i, j) for j, cell in enumerate(row) if cell == TileType.START]
+		for i, row in enumerate(maze) if TileType.START in row
+	][0][0]
+	# and take the goal position (used in the heuristic)
+	(goal_x, goal_y) = [
+		[(i, j) for j, cell in enumerate(row) if cell == TileType.END]
+		for i, row in enumerate(maze) if TileType.END in row
+	][0][0]
+	return maze, Point(start_x, start_y), Point(goal_x, goal_y)
 def main():
-    # normalize maze into numbers
-    # WHERE 0 = wall, 1 = empty, 2 = start, 3 = end
-    file = open("test_mazes/mazec1.txt", "r")
-    size = file.readline().split()[0] 
-    row = []
-    maze = []
-    for c in file.read():
-        if c == '#':
-            row.append(0)
-        elif c == '.':
-            row.append(1)
-        elif c == 'S':
-            row.append(2)
-        elif c == 'G':
-            row.append(3)
-        else:
-            maze.append(row)
-            row = []
+	maze, start, goal = initMaze("test_mazes/maze.txt")
+	print("Original Normalized Maze:")
+	printMaze(maze)
+	
+	# we have their coordinates so turn to 1 (we assume that the start and end are not walls)
+	maze[start.x][start.y] = TileType.EMPTY
+	maze[goal.x][goal.y] = TileType.EMPTY
 
-    print("Original Normalized Maze:")
-    printMaze(maze)
+	print(f"Start: {start.x}, {start.y} Destination: {goal.x}, {goal.y}")
+	
+	# Returns the closed list, we can use this to simulate making a maze
+	costs, path = A_Star(maze, goal, start)
+	count = 1 # to get explored order
 
-    # look for the beginning position
-    (start_x, start_y) = [[(i, j) for j, cell in enumerate(row) if cell == 2] for i, row in enumerate(maze) if 2 in row][0][0]
-    # and take the goal position (used in the heuristic)
-    (goal_x, goal_y) = [[(i, j) for j, cell in enumerate(row) if cell == 3] for i, row in enumerate(maze) if 3 in row][0][0]
-    
-    destination = Grid_Position(goal_x, goal_y)
-    starting_position = Grid_Position(start_x, start_y)
+	for (x, y) in path:
+		maze[x][y] = f"{count:02}"
+		count+=1
 
-    # we have their coordinates so turn to 1 (we assume that the start and end are not walls)
-    maze[start_x][start_y] = 1
-    maze[goal_x][goal_y] = 1
+	for a in range(len(maze)):
+		for i in range(len(maze[0])):
+			if maze[a][i] == TileType.WALL:
+				maze[a][i] = "##"
+			elif maze[a][i] == TileType.EMPTY:
+				maze[a][i] = ".."
 
-    print(f"\nStart: {start_x}, {start_y}\nDestination: {goal_x}, {goal_y}")
-    
-    # Returns the closed list, we can use this to simulate making a maze
-    path = A_Star(maze, destination, starting_position, int(size))
-    count = 1 # to get explored order
-
-    for i in path:
-        if count < 10:
-            maze[i[0]][i[1]] = "0" + str(count)
-        else:
-            maze[i[0]][i[1]] = count
-        count+=1
-
-    for a in range(len(maze)):
-        for i in range(len(maze[0])):
-            if maze[a][i] == 0:
-                maze[a][i] = "##"
-            elif maze[a][i] == 1:
-                maze[a][i] = ".."
-
-    print("\nSolved Maze Path: ")
-    printMaze(maze)
+	print("Solved Maze Path: ")
+	for i in maze:
+		for a in i:
+			print(a, end=" ")
+		print()
+	print("\nCosts:")
+	for i in costs:
+		for a in i:
+			print(f"{a:02}", end=" ")
+		print()
 
 if __name__ == '__main__':
-    main()
+	main()
