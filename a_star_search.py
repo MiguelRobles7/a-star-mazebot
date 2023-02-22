@@ -129,12 +129,20 @@ def main():
     
     # Returns the closed list, we can use this to simulate making a maze
     path = A_Star(maze, destination, starting_position, int(size))
+    count = 1 # to get explored order
     
-    # turn the path into a 7, temporary, just so we can see it for now
     for a in range(len(path)):
         for i in range(len(path[0])):
             if path[a][i]:
-                maze[a][i] = 7
+                if count < 10:
+                    maze[a][i] = "0" + str(count)
+                else:
+                    maze[a][i] = count
+                count+=1
+            elif maze[a][i] == 0:
+                maze[a][i] = "##"
+            elif maze[a][i] == 1:
+                maze[a][i] = ".."
 
     print("\nSolved Maze Path: ")
     printMaze(maze)
