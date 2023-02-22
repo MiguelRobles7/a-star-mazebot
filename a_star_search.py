@@ -27,6 +27,7 @@ def A_Star(maze, end, start, size):
                       for j in range(size)] # all in the closed list are unexplored for now
     closed[start.x][start.y] = True # start node is explored
 
+    indexes = [(start.x, start.y)]
     # will be used to get neighbors 
     adj_cell_x = [-1, 0, 0, 1]
     adj_cell_y = [0, -1, 1, 0]
@@ -58,7 +59,7 @@ def A_Star(maze, end, start, size):
         if current_pos.x == end.x and current_pos.y == end.y:
             print("Algorithm used = A* Algorithm")
             print("No. of moves utilized = ", cost)
-            return closed
+            return indexes
 
         x_pos = current_pos.x
         y_pos = current_pos.y
@@ -82,6 +83,7 @@ def A_Star(maze, end, start, size):
                         f = h + neighbor.cost #getting f by f = h + g
                         closed[x_pos][y_pos] = True #adding neighbour to closed
                         pq.put((f, neighbor))
+                        indexes.append((x_pos, y_pos))
 
     return -1
 def printMaze(maze):
@@ -93,7 +95,7 @@ def printMaze(maze):
 def main():
     # normalize maze into numbers
     # WHERE 0 = wall, 1 = empty, 2 = start, 3 = end
-    file = open("test_mazes/maze.txt", "r")
+    file = open("test_mazes/mazec1.txt", "r")
     size = file.readline().split()[0] 
     row = []
     maze = []
@@ -110,7 +112,7 @@ def main():
             maze.append(row)
             row = []
 
-    print("Original Maze:")
+    print("Original Normalized Maze:")
     printMaze(maze)
 
     # look for the beginning position
@@ -130,16 +132,17 @@ def main():
     # Returns the closed list, we can use this to simulate making a maze
     path = A_Star(maze, destination, starting_position, int(size))
     count = 1 # to get explored order
-    
-    for a in range(len(path)):
-        for i in range(len(path[0])):
-            if path[a][i]:
-                if count < 10:
-                    maze[a][i] = "0" + str(count)
-                else:
-                    maze[a][i] = count
-                count+=1
-            elif maze[a][i] == 0:
+
+    for i in path:
+        if count < 10:
+            maze[i[0]][i[1]] = "0" + str(count)
+        else:
+            maze[i[0]][i[1]] = count
+        count+=1
+
+    for a in range(len(maze)):
+        for i in range(len(maze[0])):
+            if maze[a][i] == 0:
                 maze[a][i] = "##"
             elif maze[a][i] == 1:
                 maze[a][i] = ".."
