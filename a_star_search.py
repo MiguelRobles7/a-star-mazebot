@@ -1,22 +1,20 @@
 import queue
 from enum import Enum
+from collections import namedtuple
+
 class TileType(Enum):
 	WALL = 0
 	EMPTY = 1
 	START = 2
 	END = 3
 # to keep track of the blocks of maze
-class Point:
-	def __init__(self, x: int, y: int):
-		self.x = x
-		self.y = y
-	def __lt__(self, _): #to fix issues on pq
-		return False
+class Point(namedtuple('Point', ['x', 'y'])):
+	pass
 
-def manhattan_distance(src: Point, dst: Point):
-	return (abs(src.x-dst.x)+abs(src.y-dst.y))
+def manhattan_distance(src, dst):
+	return (abs(src[0]-dst[0])+abs(src[1]-dst[1]))
 
-def getValidMoves(maze: list[list[TileType]], point: tuple[int,int]) -> list[tuple[int,int]]:
+def getValidMoves(maze: list[list[TileType]], point) -> list[Point]:
 	size_x, size_y = len(maze), len(maze[0])
 	validMoves = []
 	for offset in [(1,0),(0,1),(-1,0),(0,-1)]:
@@ -24,55 +22,62 @@ def getValidMoves(maze: list[list[TileType]], point: tuple[int,int]) -> list[tup
 		if x < 0 or y < 0 or x >= size_x or y >= size_y:
 			continue
 		if maze[x][y] != TileType.WALL:
-			validMoves.append((x, y))
+			validMoves.append(Point(x, y))
 	return validMoves
+
+def getOptimalPath(maze, costs, start, end):
+	optimal_path = [end]
+	while start != optimal_path[-1]:
+		a = optimal_path[-1]
+		child_cost = costs[a.x][a.y] - 1
+		for child in getValidMoves(maze, a):
+			if costs[child.x][child.y] == child_cost:
+				optimal_path.append(child)
+				break
+		else:
+			return None
+	optimal_path.reverse()
+	return optimal_path
 
 def A_Star(
 	maze: list[list[TileType]], 
 	end: Point, start: Point) -> tuple[
-		list[tuple[int,int]],
-		list[tuple[int,int]]
+		list[Point] | None,
+		list[Point]
 	]:
 
-	size_x, size_y = len(maze), len(maze[0]) #size of maze
-	pq = queue.PriorityQueue() # holds (priority, point)
-	order = [(start.x, start.y)] #the order in which states are explored
+	
+	if start == end:
+		return [start], [start]
+	order = [start] #the order in which states are explored
 
-	costs = [[-1 for _ in range(size_y)] #so that the optimal path can be traced back
-				for _ in range(size_x)] # from end to start and to check if state is explored
+	costs = [[-1 for _ in range(len(maze[i]))] #so that the optimal path can be traced back
+				for i in range(len(maze))] # from end to start and to check if state is explored
 	costs[start.x][start.y] = 0
-
+	
+	
+	pq = queue.PriorityQueue() # holds (priority, point)
 	pq.put((0, start))
 	while not pq.empty():
 		curr = pq.get()[1]
-		if curr.x == end.x and curr.y == end.y:
-			break
 		child_cost = costs[curr.x][curr.y] + 1 #the cost of each action is 1
-		for (x, y) in getValidMoves(maze, (curr.x, curr.y)):
+		for child in getValidMoves(maze, curr):
+			(x, y) = child
 			if costs[x][y] != -1:
 				continue
 
 			costs[x][y] = child_cost
-			order.append((x, y))
+			order.append(child)
 
-			child = Point(x, y)
+			if child == end:
+				return getOptimalPath(maze, costs, start, end), order
+
 			pq.put((
 				costs[x][y] + manhattan_distance(child, end), 
 				child
 			))
 
-	end = (end.x, end.y)
-	start = (start.x, start.y)
-	optimal_path = [end]
-	while start != optimal_path[-1]:
-		a = optimal_path[-1]
-		child_cost = costs[a[0]][a[1]] - 1
-		for (x, y) in getValidMoves(maze, a):
-			if costs[x][y] == child_cost:
-				optimal_path.append((x,y))
-				break
-	optimal_path.reverse()
-	return optimal_path, order
+	return None, order #the end state is unreachable
 
 
 def printMaze(maze):
@@ -124,11 +129,11 @@ def main():
 			else:
 				maze[a][i] = ".."
 
-
-	count = 1 # to get explored order
-	for (x, y) in optimal_path:
-		maze[x][y] = f"{count:02}"
-		count+=1
+	if optimal_path is not None:
+		count = 1 # to get explored order
+		for (x, y) in optimal_path:
+			maze[x][y] = f"{count:02}"
+			count+=1
 
 	print("Solved Maze Path: ")
 	for i in maze:
