@@ -41,7 +41,7 @@ def getOptimalPath(maze, costs, start, end):
 
 def A_Star(
 	maze: list[list[TileType]], 
-	end: Point, start: Point) -> tuple[
+	start: Point, end: Point) -> tuple[
 		list[Point] | None,
 		list[Point]
 	]:
@@ -80,11 +80,6 @@ def A_Star(
 	return None, order #the end state is unreachable
 
 
-def printMaze(maze):
-	for i in maze:
-		for a in i:
-			print(a.value, end=" ")
-		print()
 def initMaze(fname):
 	maze = []
 	file = open(fname, 'r')
@@ -107,20 +102,26 @@ def initMaze(fname):
 		[(i, j) for j, cell in enumerate(row) if cell == TileType.END]
 		for i, row in enumerate(maze) if TileType.END in row
 	][0][0]
+
+	# we have their coordinates so turn to 1 (we assume that the start and end are not walls)
+	maze[start_x][start_y] = TileType.EMPTY
+	maze[goal_x][goal_y] = TileType.EMPTY
+
 	return maze, Point(start_x, start_y), Point(goal_x, goal_y)
 def main():
 	maze, start, goal = initMaze("test_mazes/maze.txt")
 	print("Original Normalized Maze:")
-	printMaze(maze)
 	
-	# we have their coordinates so turn to 1 (we assume that the start and end are not walls)
-	maze[start.x][start.y] = TileType.EMPTY
-	maze[goal.x][goal.y] = TileType.EMPTY
+	for i in maze:
+		for a in i:
+			print(a.value, end=" ")
+		print()
+	
 
 	print(f"Start: {start.x}, {start.y} Destination: {goal.x}, {goal.y}")
 	
 	# Returns the closed list, we can use this to simulate making a maze
-	optimal_path, order = A_Star(maze, goal, start)
+	optimal_path, order = A_Star(maze, start, goal)
 
 	for a in range(len(maze)):
 		for i in range(len(maze[0])):
