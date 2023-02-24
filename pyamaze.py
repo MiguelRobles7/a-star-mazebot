@@ -23,10 +23,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import random,datetime,csv,os
 from tkinter import *
 from enum import Enum
-from collections import deque
 
 class COLOR(Enum):
 	'''
@@ -92,7 +90,6 @@ class agent:
 		self._body=[]
 		self.count = count
 		self.steps = 0
-		self.prevCoord = None
 		self.x = -1
 		self.y = -1
 		
@@ -114,26 +111,16 @@ class agent:
 		x=self.x*w-w+self._parentMaze._LabWidth
 		y=self.y*w-w+self._parentMaze._LabWidth
 		
-		self._coord=(y, x,y + w, x + w)
+		coord = self._coord=(y, x,y + w, x + w)
+		pos = self.position
+		labels = self._parentMaze.maze_label
 
-		if(hasattr(self,'_head')):
-			self._parentMaze._canvas.itemconfig(self._head, fill=self.color.value[1],outline="")
-			self._parentMaze._canvas.tag_raise(self._head)
-			if self.filled:
-				self._parentMaze._canvas.coords(self._head)
-			self._body.append(self._head)
-			self._head=self._parentMaze._canvas.create_rectangle(*self._coord,outline='')#stipple='gray75'
-			labels = self._parentMaze.maze_label
-			pos = self.position
-			if self.count:
-				self.steps += 1
-				labels[pos] = str(self.steps)
-			if pos in labels:
-				self._parentMaze._canvas.create_text(self.prevCoord, text = labels[pos], fill='black')
-		else:
-			self._head=self._parentMaze._canvas.create_rectangle(*self._coord,outline='')#stipple='gray75'
-		
-		self.prevCoord = (self._coord[0] + w/2,self._coord[1] + w/2)
+		self._head=self._parentMaze._canvas.create_rectangle(*coord, fill=self.color.value[1], outline='')
+		if self.count:
+			self.steps += 1
+			labels[pos] = str(self.steps)
+		if pos in labels:
+			self._parentMaze._canvas.create_text((coord[0]+w/2,coord[1]+w/2), text = labels[pos], fill='black')
 		
 
 	@property
@@ -182,10 +169,6 @@ class maze:
 		rows--> No. of rows of the maze
 		cols--> No. of columns of the maze
 		Need to pass just the two arguments. The rest will be assigned automatically
-		maze_map--> Will be set to a Dicationary. Keys will be cells and
-					values will be another dictionary with keys=['E','W','N','S'] for
-					East West North South and values will be 0 or 1. 0 means that 
-					direction(EWNS) is blocked. 1 means that direction is open.
 		grid--> A list of all cells
 		path--> Shortest path from start(bottom right) to goal(by default top left)
 				It will be a dictionary
@@ -196,7 +179,6 @@ class maze:
 						path trace by the agent.
 		_
 		'''
-		self.maze_map={}
 		self.maze_label={}
 		self.path={} 
 		self._cell_width=50  
@@ -212,12 +194,11 @@ class maze:
 	def grid(self,n):
 		self._grid=[]
 		y=0
-		for n in range(self.cols):
+		for _ in range(self.cols):
 			x = 1
 			y = 1+y
-			for m in range(self.rows):
+			for _ in range(self.rows):
 				self.grid.append((x,y))
-				self.maze_map[x,y]={'E':0,'W':0,'N':0,'S':0}
 				x = x + 1 
 	
 	def CreateMaze(self,map:list[list[TileType]],theme:COLOR=COLOR.dark):
@@ -242,8 +223,6 @@ class maze:
 		self.rows = len(map)
 		self.cols = len(map[0])
 		self.grid=[]
-		for i in self.grid:
-			self.maze_map[i] = {'E':1,'W':1,'N':1,'S':1}
 		self._drawMaze(self.theme)
 
 	def _drawMaze(self,theme):
@@ -276,69 +255,37 @@ class maze:
 		elif self.rows>=22 and self.cols>=22:
 			k=3
 		self._cell_width=round(min(((scr_height-self.rows-k*self._LabWidth)/(self.rows)),((scr_width-self.cols-k*self._LabWidth)/(self.cols)),90),3)
-		
-		# Creating Maze lines
-		if self._win is not None:
-			if self.grid is not None:
-				for cell in self.grid:
-					x,y=cell
-					w=self._cell_width
-					x=x*w-w+self._LabWidth
-					y=y*w-w+self._LabWidth
-					if self.maze_map[cell]['E']==False:
-						l=self._canvas.create_line(y + w, x, y + w, x + w,width=2,fill=theme.value[1],tag='line')
-					if self.maze_map[cell]['W']==False:
-						l=self._canvas.create_line(y, x, y, x + w,width=2,fill=theme.value[1],tag='line')
-					if self.maze_map[cell]['N']==False:
-						l=self._canvas.create_line(y, x, y + w, x,width=2,fill=theme.value[1],tag='line')
-					if self.maze_map[cell]['S']==False:
-						l=self._canvas.create_line(y, x + w, y + w, x + w,width=2,fill=theme.value[1],tag='line')
-
-
-
-
 
 	_tracePathList=[]
-	def _tracePathSingle(self,a: agent,p,kill,showMarked,delay):
+	def _tracePathSingle(self,a: agent,p,delay):
 		'''
 		An interal method to help tracePath method for tracing a path by agent.
 		'''
-		
-		def killAgent(a):
-			'''
-			if the agent should be killed after it reaches the Goal or completes the path
-			'''
-			for i in range(len(a._body)):
-				self._canvas.delete(a._body[i])
-			self._canvas.delete(a._head) 
 
 		if(len(p)==0):
-			del maze._tracePathList[0][0][a]
-			if maze._tracePathList[0][0]=={}:
-				del maze._tracePathList[0]
-				if len(maze._tracePathList)>0:
-					self.tracePath(maze._tracePathList[0][0],kill=maze._tracePathList[0][1],delay=maze._tracePathList[0][2])
-			if kill:                    
-				self._win.after(300, killAgent,a)  
-			return
+			del maze._tracePathList[0]
+			if len(maze._tracePathList) == 0:
+				return
+			for q,w in maze._tracePathList[0][0].items():
+				a=q
+				p=w
+			delay=maze._tracePathList[0][1]
 		a.x,a.y=p[0]
 		a.updatePos()
 		del p[0]
 
-		self._win.after(delay, self._tracePathSingle,a,p,kill,showMarked,delay)    
+		self._win.after(delay, self._tracePathSingle,a,p,delay)    
 
-	def tracePath(self,d,kill=False,delay=300,showMarked=False):
+	def tracePath(self,d,delay=300):
 		'''
 		A method to trace path by agent
 		You can provide more than one agent/path details
 		'''
-		self._tracePathList.append((d,kill,delay))
+		self._tracePathList.append((d,delay))
 		if maze._tracePathList[0][0]==d: 
 			for a,p in d.items():
 				if len(p)!=0:
-					p = list(map(lambda x: (x[0]+1,x[1]+1), p))
-					p.append((-1,-1))
-					self._tracePathSingle(a,p,kill,showMarked,delay)
+					self._tracePathSingle(a,p,delay)
 	def run(self):
 		'''
 		Finally to run the Tkinter Main Loop
