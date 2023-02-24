@@ -108,8 +108,8 @@ class agent:
 	
 	def updatePos(self):
 		w=self._parentMaze._cell_width
-		x=self.x*w-w+self._parentMaze._LabWidth
-		y=self.y*w-w+self._parentMaze._LabWidth
+		x=self.x*w+self._parentMaze._LabWidth
+		y=self.y*w+self._parentMaze._LabWidth
 		
 		coord = self._coord=(y, x,y + w, x + w)
 		pos = self.position
@@ -241,20 +241,10 @@ class maze:
 		self._canvas = Canvas(width=scr_width, height=scr_height, bg=theme.value[0]) # 0,0 is top left corner
 		self._canvas.pack(expand=YES, fill=BOTH)
 		# Some calculations for calculating the width of the maze cell
-		k=3.25
-		if self.rows>=95 and self.cols>=95:
-			k=0
-		elif self.rows>=80 and self.cols>=80:
-			k=1
-		elif self.rows>=70 and self.cols>=70:
-			k=1.5
-		elif self.rows>=50 and self.cols>=50:
-			k=2
-		elif self.rows>=35 and self.cols>=35:
-			k=2.5
-		elif self.rows>=22 and self.cols>=22:
-			k=3
-		self._cell_width=round(min(((scr_height-self.rows-k*self._LabWidth)/(self.rows)),((scr_width-self.cols-k*self._LabWidth)/(self.cols)),90),3)
+		self._cell_width=round(min(
+			(scr_height-4*self._LabWidth)/(self.rows+1),
+			(scr_width-4*self._LabWidth)/(self.cols+1)
+			),3)
 
 	_tracePathList=[]
 	def _tracePathSingle(self,a: agent,p,delay):
