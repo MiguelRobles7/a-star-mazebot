@@ -1,7 +1,8 @@
 import queue
 from enum import Enum
 from collections import namedtuple
-
+import webbrowser
+import os
 class TileType(Enum):
 	WALL = 0
 	EMPTY = 1
@@ -109,7 +110,11 @@ def initMaze(fname):
 
 	return maze, Point(start_x, start_y), Point(goal_x, goal_y)
 def main():
-	maze, start, goal = initMaze("test_mazes/maze.txt")
+	maze, start, goal = initMaze("test_mazes/mazec3.txt")
+
+	print("Create animation? (y/n)")
+	an = input()
+
 	print("Original Normalized Maze:")
 	
 	for i in maze:
@@ -122,6 +127,24 @@ def main():
 	
 	# Returns the closed list, we can use this to simulate making a maze
 	optimal_path, order = A_Star(maze, start, goal)
+
+	if an == 'y':
+		f = open("website/optimal.txt", "w")
+		for i in optimal_path:
+			f.write(str(i[0]) + "," + str(i[1]) + "\n")
+		f.close()
+
+		f = open("website/order.txt", "w")
+		for i in order:
+			f.write(str(i[0]) + "," + str(i[1]) + "\n")
+		f.close()
+
+		f = open("website/maze.txt", "w")
+		for i in maze:
+			for a in i:
+				f.write(str(a.value))
+			f.write("2")
+		f.close()
 
 	for a in range(len(maze)):
 		for i in range(len(maze[0])):
@@ -151,6 +174,11 @@ def main():
 		for a in i:
 			print(a, end=" ")
 		print()
+
+	if an == "y":
+		print("\nAnimation created! If not automatically opened, go to http://localhost:9000/website/index.html\n\n")
+		webbrowser.open('http://localhost:9000/website/index.html', new=0, autoraise=True)
+		os.system('python -m http.server 9000')
 
 if __name__ == '__main__':
 	main()

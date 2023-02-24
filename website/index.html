@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html class="no-js" lang="">
+  <!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Mazebot</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Icon -->
+    <link rel="icon" href="" type="image/x-icon" />
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&display=swap" rel="stylesheet" type="text/css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+
+  <body>
+    <div class="main">
+      <div class="maze" id="maze">
+        <div class="row" id="1"></div>
+      </div>
+      <div class="actions">
+        <h1> A* Algorithm </h1>
+        <p> Maze Size: <br/>
+          Start: 0, 0 <br/> 
+          Destination: 0, 0 <br/>
+          Optimal Path Length: <br/>  
+          Squares Explored: <br/>
+        </p>
+        <button> Animate Optimal Path </button>
+        <button> Animate Search Order </button>
+        <br/>
+
+        <div>
+          Animation Delay <br/>
+          <input type="range" min="0" max="3000" placeholder="Enter Animation Delay"/>
+        </div>
+        Square Size <br/>
+        <input type="number" placeholder="Enter Square Size (px)"/>
+
+        <h1> Legends </h1>
+        <p>
+          White - Blank Squares
+          Black - Wall 
+          Blue - Visited
+          Green - Optimal Path
+        </p>
+
+        <h1> *This isn't done I'll work on the aesthetics and button functions after a finishing another assessment </h1>
+
+      </div>
+    </div>
+    </footer>
+    <script>
+      // Generate Maze
+      let s = ""
+      let c = 1
+      let row = 0
+      let col = 0
+      let ar = []
+      fetch('maze.txt')
+      .then(response => response.text())
+      .then(text =>  {
+        for(let i = 0; i < text.length; i++) {
+          if(text[i] == 1) {
+            const span = document.createElement("span");
+            span.setAttribute("class", "square road");
+            span.setAttribute("id", row + "," + col);
+            const element = document.getElementById(c);
+            element.appendChild(span).cloneNode(true);
+          }
+          else if(text[i] == 0){
+            const span = document.createElement("span");
+            span.setAttribute("class", "square wall");
+            const element = document.getElementById(c);
+            element.appendChild(span).cloneNode(true);
+            s += "## "
+          }
+          else if(text[i] == 2){
+            const div = document.createElement("div");
+            c++
+            row++
+            col=-1
+            div.setAttribute("id", c)
+            div.setAttribute("class", "row")
+            const element = document.getElementById("maze");
+            element.appendChild(div).cloneNode(true);
+          }
+          col++
+        }
+      });
+      
+      // Animate
+      async function display(file, toRemove, toAdd){
+        let i = 0;                  //  set your counter to 1
+        fetch(file)
+        .then(response => response.text())
+        .then(text =>  {
+          ar = text.split(/\r\n|\n/)
+          function animate() {         //  create a loop function
+            setTimeout(function() {   //  call a 3s setTimeout when the loop is called
+              const text = document.createTextNode(String(i+1))
+              let ss = ar[i]
+              const element = document.getElementById(ss)
+              element.classList.remove(toRemove)
+              element.classList.add(toAdd)
+              element.appendChild(text).cloneNode(true)
+              console.log(ar[i])
+              i++
+              if (i < ar.length - 1) {          
+                animate()            
+              }                       
+            }, 500)
+         }
+          animate()
+        })
+      }
+      // display("order.txt", "road", "visited")
+      display("optimal.txt", "road", "optimal")
+    </script>
+  </body>
+</html>
