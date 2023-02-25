@@ -271,7 +271,7 @@ class maze:
 		A method to trace path by agent
 		You can provide more than one agent/path details
 		'''
-		self._tracePathList.append((d,delay))
+		self._tracePathList.append((d,delay))s
 		if maze._tracePathList[0][0]==d: 
 			for a,p in d.items():
 				if len(p)!=0:
