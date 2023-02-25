@@ -1,4 +1,4 @@
-from a_star_search import TileType
+from app import TileType
 """
 License
 https://www.youtube.com/c/LearningOrbis
