@@ -110,7 +110,7 @@ def initMaze(fname):
 
 	return maze, Point(start_x, start_y), Point(goal_x, goal_y)
 def main():
-	maze, start, goal = initMaze("test_mazes/mazec3.txt")
+	maze, start, goal = initMaze("test_mazes/maze.txt")
 
 	print("Create animation? (y/n)")
 	an = input()
@@ -129,14 +129,18 @@ def main():
 	optimal_path, order = A_Star(maze, start, goal)
 
 	if an == 'y':
+		optimal_count = 0
+		squares_explored = 0
 		f = open("website/optimal.txt", "w")
 		for i in optimal_path:
 			f.write(str(i[0]) + "," + str(i[1]) + "\n")
+			optimal_count += 1
 		f.close()
 
 		f = open("website/order.txt", "w")
 		for i in order:
 			f.write(str(i[0]) + "," + str(i[1]) + "\n")
+			squares_explored += 1
 		f.close()
 
 		f = open("website/maze.txt", "w")
@@ -144,6 +148,14 @@ def main():
 			for a in i:
 				f.write(str(a.value))
 			f.write("2")
+		f.close()
+
+		f = open("website/info.txt", "w")
+		f.write("Size: " + str(len(maze[0])) + "\n")
+		f.write("Starting Position: " + str(start.x) + "," + str(start.y) + "\n")
+		f.write("Goal Position: " + str(goal.x) + "," + str(goal.y) + "\n")
+		f.write("Number of Squares Explored: " + str(squares_explored) + "\n")
+		f.write("Optimal Squares to Goal: " + str(optimal_count))
 		f.close()
 
 	for a in range(len(maze)):

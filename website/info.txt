@@ -1,0 +1,5 @@
+Size: 10
+Starting Position: 0,0
+Goal Position: 9,0
+Number of Squares Explored: 42
+Optimal Squares to Goal: 28

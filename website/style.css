@@ -1,77 +1,143 @@
+@font-face {
+  font-family: SpaceGrotesk;
+  src: url("fonts/SpaceGrotesk-Regular.ttf");
+}
+
+@font-face {
+  font-family: SpaceGroteskMedium;
+  src: url("fonts/SpaceGrotesk-Medium.ttf");
+}
+
+@font-face {
+  font-family: SpaceGroteskBold;
+  src: url("fonts/SpaceGrotesk-Bold.ttf");
+}
+@font-face {
+  font-family: SpaceGroteskLight;
+  src: url("fonts/SpaceGrotesk-Light.ttf");
+}
+@font-face {
+  font-family: Degular;
+  src: url("fonts/DegularText-Regular.otf");
+}
+@font-face {
+  font-family: DegularMedium;
+  src: url("fonts/DegularText-Medium.otf");
+}
 html,
 body {
-  background-color: #fff;
-  font-size: 15px;
-  color: #000;
+  background-color: #f2f2f2;
+  font-size: 100%;
+  color: #181818;
   padding: 0;
   margin: 5px;
-  font-family: "roboto", sans-serif;
-  font-weight: 300;
+  font-family: SpaceGrotesk;
 }
 
-@font-face {
-  font-family: Atyp;
-  src: url("../fonts/AtypDisplay-Bold.ttf");
+span.info{
+  font-family: SpaceGroteskBold;
+  font-size: .6em;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 4px;
+  gap: 10px;
+  background: linear-gradient(90deg, #E9EDF1 0%, #d8dce0 100%);
+  border: 1px solid black;
+  border-radius: 5px;
+  margin: 0;
 }
-@font-face {
-  font-family: AtypSemiBold;
-  src: url("../fonts/AtypDisplay-Semibold.ttf");
+h1 {
+  font-family: SpaceGroteskBold;
+  margin: 0 0 0 0;
+  padding: 0;
+  font-size: x-large;
+  font-size: 1em;
 }
-
-@font-face {
-  font-family: AtypBold;
-  src: url("../fonts/AtypText-Bold.ttf");
+h2 {
+  font-family: SpaceGroteskLight;
+  margin: 0 0 0 0;
+  padding: 0;
+  font-size: large;
+  font-size: .8em;
+}
+p{
+  font-family: DegularMedium;
+  margin: 0 0 0 0;
+  padding: 0;
+  font-size: .8em;
+}
+.container {
+  margin: 5px;
+}
+.row {
+  display: flex;
+  width: fit-content;
+}
+.maze {
+  width: 100%;
+  height: 100%;
+  margin: 5px 0;
+}
+.actions {
+  margin: 0 20px;
+}
+.button-row {
+  display: flex;
+  width: fit-content;
+}
+.settings-btn{
+  margin: 5px 0 0 0;
+}
+.num-input {
+  width: 60px;
+  margin: 0 0 5px 5px;
+}
+button {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 4px;
+  letter-spacing: .5px;
+  font-family: SpaceGroteskBold;
+  background: linear-gradient(180deg, #E9EDF1 0%, #d5d6d8 100%);
+  border-radius: 5px;
+  margin: 0 0 0 5px;
+}
+button:hover {
+    border-color: silver;
 }
 span.square {
-  width: 2vw;
-  height: 2vw;
+  width: 1.5em;
+  height: 1.5em;
   border: 1px solid black;    
-  margin: 0; 
+  margin: 0;
 }
 span.visited {
   background-color: blue;
   color: white;
   animation-name: visited;
-  animation-duration: 2s;
+  animation-duration: 1s;
 }
-
 @keyframes visited {
   from {background-color: white;}
   to {background-color: blue;}
 }
-
 span.optimal {
   background-color: green;
   color: white;
   animation-name: optimal;
-  animation-duration: 2s;
+  animation-duration: 1s;
 }
-
 @keyframes optimal {
   from {background-color: blue;}
   to {background-color: green;}
 }
-
 span.wall {  
   background-color: grey;
 }
-
 span.road {
   background-color: white;
-}
-
-.row {
-  display: flex;
-  width: fit-content;
-}
-
-.maze {
-  width: 100%;
-  height: 100%;
-  padding: 5px;
-
-}
-
-.actions {
-  margin: 0 20px;
 }

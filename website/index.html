@@ -36,42 +36,53 @@
 
   <body>
     <div class="main">
-      <div class="maze" id="maze">
-        <div class="row" id="1"></div>
-      </div>
-      <div class="actions">
-        <h1> A* Algorithm </h1>
-        <p> Maze Size: <br/>
-          Start: 0, 0 <br/> 
-          Destination: 0, 0 <br/>
-          Optimal Path Length: <br/>  
-          Squares Explored: <br/>
-        </p>
-        <button> Animate Optimal Path </button>
-        <button> Animate Search Order </button>
-        <br/>
-
-        <div>
-          Animation Delay <br/>
-          <input type="range" min="0" max="3000" placeholder="Enter Animation Delay"/>
+      <div class="container">
+        <div class="row">
+          <h1> <span> Optimal Path </span> Visualization </h1>
+          <div class="button-row">
+            <button id="opt-btn" onclick="display('optimal.txt', 'road', 'optimal')"> Optimal Path </button>
+            <button id="order-btn" onclick="display('order.txt', 'road', 'visited')"> Search Order</button>
+          </div>
         </div>
-        Square Size <br/>
-        <input type="number" placeholder="Enter Square Size (px)"/>
+        <span id="size" class="info"></span>
+        <span id="start" class="info"></span>
+        <span id="goal" class="info"></span>
+        <span id="opti" class="info"></span>
+        <span id="vist" class="info"></span>
+        <div class="maze" id="maze">
+          <div class="row" id="1"></div>
+        </div>
+      </div>
 
-        <h1> Legends </h1>
-        <p>
-          White - Blank Squares
-          Black - Wall 
-          Blue - Visited
-          Green - Optimal Path
-        </p>
+      <hr class="solid">
 
-        <h1> *This isn't done I'll work on the aesthetics and button functions after a finishing another assessment </h1>
-
+      <div class="container">
+        <h1> Settings </h1>
+        <div class="row">
+          <h2>Animation Delay: </h2>
+          <input id="animation_delay" class="num-input" type="number" min="0" max="3000" placeholder="200ms"/>
+        </div>
+        <div class="row">
+          <h2>Square Size: </h2>
+          <input id="sq-size" class="num-input" type="number" min="0" placeholder="24px"/>
+        </div>
+        <button onclick="changeSquareSize()" class="settings-btn"> Save </button>
       </div>
     </div>
     </footer>
     <script>
+      // Get Info
+      async function getInfo(){
+        fetch('info.txt').then(response => response.text()).then(text =>  {
+          ar = text.split(/\r\n|\n/)
+          document.getElementById("size").innerHTML = ar[0]
+          document.getElementById("start").innerHTML = ar[1]
+          document.getElementById("goal").innerHTML = ar[2]
+          document.getElementById("vist").innerHTML = ar[3]
+          document.getElementById("opti").innerHTML = ar[4]
+        })
+      }
+      getInfo()
       // Generate Maze
       let s = ""
       let c = 1
@@ -109,33 +120,66 @@
           col++
         }
       });
-      
-      // Animate
-      async function display(file, toRemove, toAdd){
-        let i = 0;                  //  set your counter to 1
+      async function changeSquareSize() {
+        let num = document.getElementById("sq-size").value
+        let squares = document.getElementsByClassName("square")
+        for(let i = 0; i < squares.length; i++) {
+          squares[i].style.width = num + "px"
+          squares[i].style.height = num + "px"
+        }
+      }
+      async function clearAnimation(file){
         fetch(file)
         .then(response => response.text())
         .then(text =>  {
           ar = text.split(/\r\n|\n/)
-          function animate() {         //  create a loop function
-            setTimeout(function() {   //  call a 3s setTimeout when the loop is called
-              const text = document.createTextNode(String(i+1))
+          for(let i = 0; i < ar.length; i++) {
+            let element = document.getElementById(ar[i])
+            element.className = 'square road'
+            while (element.firstChild) {
+              element.removeChild(element.lastChild);
+            }
+          }
+        })
+      }
+      prev_file = "optimal.txt"
+      // Animate
+      async function display(file, toRemove, toAdd){
+        if(document.getElementById("animation_delay").value)
+          var delay = document.getElementById("animation_delay").value
+        else
+          var delay = 200
+
+        let i = 0; //  set your counter to 1
+        await clearAnimation(prev_file)
+
+        fetch(file)
+        .then(response => response.text())
+        .then(text =>  {
+          ar = text.split(/\r\n|\n/)
+          function animate() {
+            setTimeout(function() {
+              let text = document.createTextNode(String(i+1))
               let ss = ar[i]
-              const element = document.getElementById(ss)
-              element.classList.remove(toRemove)
-              element.classList.add(toAdd)
+              let element = document.getElementById(ss)
+              element.className = "square " + toAdd
+              while (element.firstChild) {
+                element.removeChild(element.lastChild);
+              }
               element.appendChild(text).cloneNode(true)
               console.log(ar[i])
               i++
               if (i < ar.length - 1) {          
-                animate()            
-              }                       
-            }, 500)
+                animate()
+              }             
+            }, delay)
          }
           animate()
         })
+        prev_file = file
       }
       // display("order.txt", "road", "visited")
+      // display("optimal.txt", "visited", "optimal")
       display("optimal.txt", "road", "optimal")
     </script>
   </body>
