@@ -47,7 +47,8 @@ def A_Star(
 		list[Point]
 	]:
 
-	
+	if maze[start.x][start.y] == TileType.WALL:
+		return None, []
 	if start == end:
 		return [start], [start]
 	order = [start] #the order in which states are explored
