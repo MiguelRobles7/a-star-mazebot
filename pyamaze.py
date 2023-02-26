@@ -235,15 +235,14 @@ class maze:
 		self._win.state('zoomed')
 		self._win.title('PYTHON MAZE WORLD by Learning Orbis')
 		
-		scr_width=self._win.winfo_screenwidth()
-		scr_height=self._win.winfo_screenheight()
+		scr_width=self._win.winfo_width()
+		scr_height=self._win.winfo_height()
 		self._win.geometry(f"{scr_width}x{scr_height}+0+0")
 		self._canvas = Canvas(width=scr_width, height=scr_height, bg=theme.value[0]) # 0,0 is top left corner
 		self._canvas.pack(expand=YES, fill=BOTH)
-		# Some calculations for calculating the width of the maze cell
 		self._cell_width=round(min(
-			(scr_height-4*self._LabWidth)/(self.rows+1),
-			(scr_width-4*self._LabWidth)/(self.cols+1)
+			(scr_height-2*self._LabWidth)/self.rows,
+			(scr_width-2*self._LabWidth)/self.cols
 			),3)
 
 	_tracePathList=[]
