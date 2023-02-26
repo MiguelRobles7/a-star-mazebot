@@ -1,5 +1,5 @@
 from app import A_Star, initMaze, TileType
-from pyamaze import maze, COLOR, agent
+from pyamaze import maze, COLOR, agent, textLabel
 def getWalls(m):
 	return [(ix,iy) for ix, row in enumerate(m) for iy, i in enumerate(row) if i == TileType.WALL]
 def main():
