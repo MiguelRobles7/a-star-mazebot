@@ -11,10 +11,10 @@ class TileType(Enum):
 # to keep track of the blocks of maze
 class Point(namedtuple('Point', ['x', 'y'])):
 	pass
-
+# manhattan_distance
 def manhattan_distance(src, dst):
 	return (abs(src[0]-dst[0])+abs(src[1]-dst[1]))
-
+# returns points (up down left right) that are not walls
 def getValidMoves(maze: list[list[TileType]], point) -> list[Point]:
 	size_x, size_y = len(maze), len(maze[0])
 	validMoves = []
@@ -25,7 +25,7 @@ def getValidMoves(maze: list[list[TileType]], point) -> list[Point]:
 		if maze[x][y] != TileType.WALL:
 			validMoves.append(Point(x, y))
 	return validMoves
-
+#given the cost table, trace back the path A* took from end to start
 def getOptimalPath(maze, costs, start, end):
 	optimal_path = [end]
 	while start != optimal_path[-1]:
@@ -39,7 +39,7 @@ def getOptimalPath(maze, costs, start, end):
 			return None
 	optimal_path.reverse()
 	return optimal_path
-
+#the search algorithm
 def A_Star(
 	maze: list[list[TileType]], 
 	start: Point, end: Point) -> tuple[
