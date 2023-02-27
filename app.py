@@ -92,7 +92,7 @@ def initMaze(fname):
 		'S': TileType.START,
 		'G': TileType.END
 	}
-	for row in file.read().split('\n'):
+	for row in file.read().strip().split('\n'):
 		maze.append(list(map(lambda c: types[c], row)))
 	# look for the beginning position
 	(start_x, start_y) = [
