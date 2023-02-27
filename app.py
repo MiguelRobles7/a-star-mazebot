@@ -83,7 +83,7 @@ def A_Star(
 
 
 def initMaze(fname):
-	maze = []
+	maze = [ ]
 	file = open(fname, 'r')
 	file.readline().split()[0]
 	types = {
