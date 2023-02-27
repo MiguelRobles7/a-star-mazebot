@@ -36,19 +36,19 @@ def getOptimalPath(maze, costs, start, end):
 				optimal_path.append(child)
 				break
 		else:
-			return None
+			return []
 	optimal_path.reverse()
 	return optimal_path
 #the search algorithm
 def A_Star(
 	maze: list[list[TileType]], 
 	start: Point, end: Point) -> tuple[
-		list[Point] | None,
+		list[Point],
 		list[Point]
 	]:
 
 	if maze[start.x][start.y] == TileType.WALL:
-		return None, []
+		return [], []
 	if start == end:
 		return [start], [start]
 	order = [start] #the order in which states are explored
@@ -79,7 +79,7 @@ def A_Star(
 				child
 			))
 
-	return None, order #the end state is unreachable
+	return [], order #the end state is unreachable
 
 
 def initMaze(fname):
@@ -133,7 +133,7 @@ def main():
 		optimal_count = 0
 		squares_explored = 0
 		f = open("website/optimal.txt", "w")
-		for i in optimal_path or []:
+		for i in optimal_path:
 			f.write(str(i[0]) + "," + str(i[1]) + "\n")
 			optimal_count += 1
 		f.close()
@@ -166,11 +166,10 @@ def main():
 			else:
 				maze[a][i] = ".."
 
-	if optimal_path is not None:
-		count = 1 # to get explored order
-		for (x, y) in optimal_path:
-			maze[x][y] = f"{count:02}"
-			count+=1
+	count = 1 # to get explored order
+	for (x, y) in optimal_path:
+		maze[x][y] = f"{count:02}"
+		count+=1
 
 	print("Solved Maze Path: ")
 	for i in maze:
