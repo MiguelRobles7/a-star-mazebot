@@ -133,7 +133,7 @@ def main():
 		optimal_count = 0
 		squares_explored = 0
 		f = open("website/optimal.txt", "w")
-		for i in optimal_path:
+		for i in optimal_path or []:
 			f.write(str(i[0]) + "," + str(i[1]) + "\n")
 			optimal_count += 1
 		f.close()
