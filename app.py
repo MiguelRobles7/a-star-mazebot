@@ -59,9 +59,9 @@ def A_Star(
 	
 	
 	pq = queue.PriorityQueue() # holds (priority, point)
-	pq.put((0, start))
+	pq.put(('hello', 'world', start))
 	while not pq.empty():
-		curr = pq.get()[1]
+		curr = pq.get()[2]
 		parent_cost = costs[curr.x][curr.y]
 
 		#a state is explored after its child nodes are expanded
@@ -77,9 +77,11 @@ def A_Star(
 
 			#the heuristic is consistent so the cost of the state is final once placed in explored
 			costs[x][y] = parent_cost + 1 #the cost of each action is 1
+			h = manhattan_distance(child, end)
 
 			pq.put((
-				costs[x][y] + manhattan_distance(child, end), 
+				costs[x][y] + h, 
+				h,
 				child
 			))
 
@@ -115,7 +117,7 @@ def initMaze(fname):
 
 	return maze, Point(start_x, start_y), Point(goal_x, goal_y)
 def main():
-	maze, start, goal = initMaze("test_mazes/maze.txt")
+	maze, start, goal = initMaze("test_mazes/worstCase.txt")
 
 	print("Create animation? (y/n)")
 	an = input()
