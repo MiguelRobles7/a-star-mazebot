@@ -26,7 +26,7 @@ def getValidMoves(maze: list[list[TileType]], point) -> list[Point]:
 			validMoves.append(Point(x, y))
 	return validMoves
 #given the cost table, trace back the path A* took from end to start
-def getOptimalPath(maze, costs, start, end):
+def traceOptimalPath(maze, costs, start, end):
 	optimal_path = [end]
 	while start != optimal_path[-1]:
 		a = optimal_path[-1]
@@ -49,9 +49,8 @@ def A_Star(
 
 	if maze[start.x][start.y] == TileType.WALL:
 		return [], []
-	if start == end:
-		return [start], [start]
-	order = [start] #the order in which states are explored
+	
+	order = [] #the order in which states are explored
 
 	costs = [[-1 for _ in range(len(maze[i]))] #so that the optimal path can be traced back
 				for i in range(len(maze))] # from end to start and to check if state is explored
@@ -62,17 +61,21 @@ def A_Star(
 	pq.put((0, start))
 	while not pq.empty():
 		curr = pq.get()[1]
-		child_cost = costs[curr.x][curr.y] + 1 #the cost of each action is 1
+		parent_cost = costs[curr.x][curr.y]
+
+		#a state is explored after its child nodes are expanded
+		#so this is placed in the outer loop
+		order.append(curr)
+		if curr == end:
+			return traceOptimalPath(maze, costs, start, end), order
+
 		for child in getValidMoves(maze, curr):
 			(x, y) = child
-			if costs[x][y] != -1:
-				continue
+			if costs[x][y] != -1: #not yet explored
+				continue 
 
-			costs[x][y] = child_cost
-			order.append(child)
-
-			if child == end:
-				return getOptimalPath(maze, costs, start, end), order
+			#the heuristic is consistent so the cost of the state is final once placed in explored
+			costs[x][y] = parent_cost + 1 #the cost of each action is 1
 
 			pq.put((
 				costs[x][y] + manhattan_distance(child, end), 
