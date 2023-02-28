@@ -10,7 +10,8 @@ class TileType(Enum):
 	END = 3
 # to keep track of the blocks of maze
 class Point(namedtuple('Point', ['x', 'y'])):
-	pass
+	def __lt__(self,_):
+		return False
 # manhattan_distance
 def manhattan_distance(src, dst):
 	return (abs(src[0]-dst[0])+abs(src[1]-dst[1]))
