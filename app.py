@@ -51,21 +51,24 @@ def A_Star(
 	if maze[start.x][start.y] == TileType.WALL:
 		return [], []
 	
-	order = [] #the order in which states are explored
+	order = [] #the order in which states are explored, not part of the algo
 
+	#-1: unexlpored
+	#-2: in frontier
 	costs = [[-1 for _ in range(len(maze[i]))] #so that the optimal path can be traced back
 				for i in range(len(maze))] # from end to start and to check if state is explored
-	costs[start.x][start.y] = 0
 	
 	
-	pq = queue.PriorityQueue() # holds (priority, point)
-	pq.put(('hello', 'world', start))
-	while not pq.empty():
-		curr = pq.get()[2]
-		parent_cost = costs[curr.x][curr.y]
+	pq = queue.PriorityQueue() #(priority, heuristic, state, cost)
+	pq.put(('hello', 'world', start, 0))
 
-		#a state is explored after its child nodes are expanded
+	while not pq.empty():
+		curr, parent_cost = pq.get()[2:]
+
+		#a state is explored when its child nodes are expanded
 		#so this is placed in the outer loop
+		costs[curr.x][curr.y] = parent_cost
+
 		order.append(curr)
 		if curr == end:
 			return traceOptimalPath(maze, costs, start, end), order
@@ -75,14 +78,17 @@ def A_Star(
 			if costs[x][y] != -1: #not yet explored
 				continue 
 
-			#the heuristic is consistent so the cost of the state is final once placed in explored
-			costs[x][y] = parent_cost + 1 #the cost of each action is 1
-			h = manhattan_distance(child, end)
+			#the heuristic is consistent so the cost of the state is optimal once it is explored
+			#the cost of all actions is 1 so if the parent is optimal, 
+			#the child is also optimal, and no need to place the same state in frontier
+			costs[x][y] = -2 #in frontier
+			heuristic = manhattan_distance(child, end)
 
 			pq.put((
-				costs[x][y] + h, 
-				h,
-				child
+				heuristic + parent_cost+1, 
+				heuristic,
+				child,
+				parent_cost+1, #the cost of each action is 1
 			))
 
 	return [], order #the end state is unreachable
