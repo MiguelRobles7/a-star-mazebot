@@ -270,11 +270,13 @@ class maze:
 		A method to trace path by agent
 		You can provide more than one agent/path details
 		'''
+		for a in d.items():
+			if len(a[1]) == 0:
+				return
 		self._tracePathList.append((d,delay))
 		if maze._tracePathList[0][0]==d: 
 			for a,p in d.items():
-				if len(p)!=0:
-					self._tracePathSingle(a,p,delay)
+				self._tracePathSingle(a,p,delay)
 	def run(self):
 		'''
 		Finally to run the Tkinter Main Loop
