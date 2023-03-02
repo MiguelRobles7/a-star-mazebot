@@ -54,8 +54,6 @@ def A_Star(
 	
 	order = [] #the order in which states are explored, not part of the algo
 
-	#-1: unexlpored
-	#-2: in frontier
 	costs = [[-1 for _ in range(len(maze[i]))] #so that the optimal path can be traced back
 				for i in range(len(maze))] # from end to start and to check if state is explored
 	
@@ -66,7 +64,7 @@ def A_Star(
 	while not pq.empty():
 		curr, parent_cost = pq.get()[2:]
 		#the heuristic is consistent so the cost of the state is optimal once it is explored
-		if costs[curr.x][curr.y] >= 0:
+		if costs[curr.x][curr.y] != -1:
 			continue
 		#a state is explored when its child nodes are expanded
 		#so this is placed in the outer loop
@@ -77,10 +75,9 @@ def A_Star(
 
 		for child in getValidMoves(maze, curr):
 			(x, y) = child
-			if costs[x][y] >= 0: #not yet explored
+			if costs[x][y] != -1: #not yet explored
 				continue 
 
-			costs[x][y] = -2 #in frontier
 			heuristic = manhattan_distance(child, end)
 
 			pq.put((
