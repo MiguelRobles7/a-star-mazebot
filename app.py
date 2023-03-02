@@ -41,6 +41,7 @@ def traceOptimalPath(maze, costs, start, end):
 	optimal_path.reverse()
 	return optimal_path
 #the search algorithm
+#the search algorithm
 def A_Star(
 	maze: list[list[TileType]], 
 	start: Point, end: Point) -> tuple[
@@ -64,23 +65,21 @@ def A_Star(
 
 	while not pq.empty():
 		curr, parent_cost = pq.get()[2:]
-
+		#the heuristic is consistent so the cost of the state is optimal once it is explored
+		if costs[curr.x][curr.y] >= 0:
+			continue
 		#a state is explored when its child nodes are expanded
 		#so this is placed in the outer loop
 		costs[curr.x][curr.y] = parent_cost
-
 		order.append(curr)
 		if curr == end:
 			return traceOptimalPath(maze, costs, start, end), order
 
 		for child in getValidMoves(maze, curr):
 			(x, y) = child
-			if costs[x][y] != -1: #not yet explored
+			if costs[x][y] >= 0: #not yet explored
 				continue 
 
-			#the heuristic is consistent so the cost of the state is optimal once it is explored
-			#the cost of all actions is 1 so if the parent is optimal, 
-			#the child is also optimal, and no need to place the same state in frontier
 			costs[x][y] = -2 #in frontier
 			heuristic = manhattan_distance(child, end)
 
