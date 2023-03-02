@@ -41,7 +41,6 @@ def traceOptimalPath(maze, costs, start, end):
 	optimal_path.reverse()
 	return optimal_path
 #the search algorithm
-#the search algorithm
 def A_Star(
 	maze: list[list[TileType]], 
 	start: Point, end: Point) -> tuple[
@@ -58,21 +57,21 @@ def A_Star(
 				for i in range(len(maze))] # from end to start and to check if state is explored
 	
 	
-	pq = queue.PriorityQueue() #(priority, heuristic, state, cost)
-	pq.put(('hello', 'world', start, 0))
+	pq = queue.PriorityQueue() #(priority, heuristic, state)
+	pq.put((0, 0, start))
 
 	while not pq.empty():
-		curr, parent_cost = pq.get()[2:]
+		prio, h, curr = pq.get()
 		#the heuristic is consistent so the cost of the state is optimal once it is explored
 		if costs[curr.x][curr.y] != -1:
 			continue
 		#a state is explored when its child nodes are expanded
 		#so this is placed in the outer loop
-		costs[curr.x][curr.y] = parent_cost
+		costs[curr.x][curr.y] = prio - h
 		order.append(curr)
 		if curr == end:
 			return traceOptimalPath(maze, costs, start, end), order
-
+		child_cost = prio - h + 1 #the cost of each action is 1
 		for child in getValidMoves(maze, curr):
 			(x, y) = child
 			if costs[x][y] != -1: #not yet explored
@@ -81,10 +80,9 @@ def A_Star(
 			heuristic = manhattan_distance(child, end)
 
 			pq.put((
-				heuristic + parent_cost+1, 
+				heuristic + child_cost,
 				heuristic,
 				child,
-				parent_cost+1, #the cost of each action is 1
 			))
 
 	return [], order #the end state is unreachable
