@@ -34,15 +34,15 @@ body {
   font-family: SpaceGrotesk;
 }
 
-span.info{
+span.info {
   font-family: SpaceGroteskBold;
-  font-size: .6em;
+  font-size: 0.6em;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   padding: 2px 4px;
   gap: 10px;
-  background: linear-gradient(90deg, #E9EDF1 0%, #d8dce0 100%);
+  background: linear-gradient(90deg, #e9edf1 0%, #d8dce0 100%);
   border: 1px solid black;
   border-radius: 5px;
   margin: 0;
@@ -59,13 +59,13 @@ h2 {
   margin: 0 0 0 0;
   padding: 0;
   font-size: large;
-  font-size: .8em;
+  font-size: 0.8em;
 }
-p{
+p {
   font-family: DegularMedium;
   margin: 0 0 0 0;
   padding: 0;
-  font-size: .8em;
+  font-size: 0.8em;
 }
 .container {
   margin: 5px;
@@ -86,7 +86,7 @@ p{
   display: flex;
   width: fit-content;
 }
-.settings-btn{
+.settings-btn {
   margin: 5px 0 0 0;
 }
 .num-input {
@@ -100,19 +100,19 @@ button {
   justify-content: center;
   align-items: center;
   padding: 2px 4px;
-  letter-spacing: .5px;
+  letter-spacing: 0.5px;
   font-family: SpaceGroteskBold;
-  background: linear-gradient(180deg, #E9EDF1 0%, #d5d6d8 100%);
+  background: linear-gradient(180deg, #e9edf1 0%, #d5d6d8 100%);
   border-radius: 5px;
   margin: 0 0 0 5px;
 }
 button:hover {
-    border-color: silver;
+  border-color: silver;
 }
 span.square {
   width: 1.5em;
   height: 1.5em;
-  border: 1px solid black;    
+  border: 1px solid black;
   margin: 0;
 }
 span.visited {
@@ -122,8 +122,12 @@ span.visited {
   animation-duration: 1s;
 }
 @keyframes visited {
-  from {background-color: white;}
-  to {background-color: blue;}
+  from {
+    background-color: white;
+  }
+  to {
+    background-color: blue;
+  }
 }
 span.optimal {
   background-color: green;
@@ -132,10 +136,14 @@ span.optimal {
   animation-duration: 1s;
 }
 @keyframes optimal {
-  from {background-color: blue;}
-  to {background-color: green;}
+  from {
+    background-color: blue;
+  }
+  to {
+    background-color: green;
+  }
 }
-span.wall {  
+span.wall {
   background-color: grey;
 }
 span.road {
