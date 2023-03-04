@@ -127,8 +127,8 @@ def main():
 			print(a.value, end=" ")
 		print()
 	
-
-	print(f"Start: {start.x}, {start.y} Destination: {goal.x}, {goal.y}")
+	# x is y (as coordinates)
+	print(f"Start: {start.y}, {start.x} Destination: {goal.y}, {goal.x}")
 	
 	# Returns the closed list, we can use this to simulate making a maze
 	optimal_path, order = a_star(maze, start, goal)
@@ -157,8 +157,8 @@ def main():
 
 		f = open("website/info.txt", "w")
 		f.write("Size: " + str(len(maze[0])) + "\n")
-		f.write("Starting Position: " + str(start.x) + "," + str(start.y) + "\n")
-		f.write("Goal Position: " + str(goal.x) + "," + str(goal.y) + "\n")
+		f.write("Starting Position: " + str(start.y) + "," + str(start.x) + "\n")
+		f.write("Goal Position: " + str(goal.y) + "," + str(goal.x) + "\n")
 		f.write("Number of Squares Explored: " + str(squares_explored) + "\n")
 		f.write("Optimal Squares to Goal: " + str(optimal_count))
 		f.close()
