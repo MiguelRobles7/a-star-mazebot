@@ -16,23 +16,23 @@ class Point(namedtuple('Point', ['x', 'y'])):
 def manhattan_distance(src, dst):
 	return (abs(src[0]-dst[0])+abs(src[1]-dst[1]))
 # returns points (up down left right) that are not walls
-def getValidMoves(maze: list[list[TileType]], point) -> list[Point]:
+def get_valid_moves(maze: list[list[TileType]], point) -> list[Point]:
 	size_x, size_y = len(maze), len(maze[0])
-	validMoves = []
+	valid_moves = []
 	for offset in [(1,0),(0,1),(-1,0),(0,-1)]:
 		x, y = point[0] + offset[0], point[1] + offset[1]
 		if x < 0 or y < 0 or x >= size_x or y >= size_y:
 			continue
 		if maze[x][y] != TileType.WALL:
-			validMoves.append(Point(x, y))
-	return validMoves
+			valid_moves.append(Point(x, y))
+	return valid_moves
 #given the cost table, trace back the path A* took from end to start
-def traceOptimalPath(maze, costs, start, end):
+def trace_optimal_path(maze, costs, start, end):
 	optimal_path = [end]
 	while start != optimal_path[-1]:
 		a = optimal_path[-1]
 		child_cost = costs[a.x][a.y] - 1
-		for child in getValidMoves(maze, a):
+		for child in get_valid_moves(maze, a):
 			if costs[child.x][child.y] == child_cost:
 				optimal_path.append(child)
 				break
@@ -41,7 +41,7 @@ def traceOptimalPath(maze, costs, start, end):
 	optimal_path.reverse()
 	return optimal_path
 #the search algorithm
-def A_Star(
+def a_star(
 	maze: list[list[TileType]], 
 	start: Point, end: Point) -> tuple[
 		list[Point],
@@ -70,9 +70,9 @@ def A_Star(
 		costs[curr.x][curr.y] = prio - h
 		order.append(curr)
 		if curr == end:
-			return traceOptimalPath(maze, costs, start, end), order
+			return trace_optimal_path(maze, costs, start, end), order
 		child_cost = prio - h + 1 #the cost of each action is 1
-		for child in getValidMoves(maze, curr):
+		for child in get_valid_moves(maze, curr):
 			(x, y) = child
 			if costs[x][y] != -1: #not yet explored
 				continue 
@@ -86,9 +86,7 @@ def A_Star(
 			))
 
 	return [], order #the end state is unreachable
-
-
-def initMaze(fname):
+def init_maze(fname):
 	maze = [ ]
 	file = open(fname, 'r')
 	file.readline().split()[0]
@@ -117,7 +115,7 @@ def initMaze(fname):
 
 	return maze, Point(start_x, start_y), Point(goal_x, goal_y)
 def main():
-	maze, start, goal = initMaze("test_mazes/worstCase.txt")
+	maze, start, goal = init_maze("test_mazes/maze.txt")
 
 	print("Create animation? (y/n)")
 	an = input()
@@ -133,7 +131,7 @@ def main():
 	print(f"Start: {start.x}, {start.y} Destination: {goal.x}, {goal.y}")
 	
 	# Returns the closed list, we can use this to simulate making a maze
-	optimal_path, order = A_Star(maze, start, goal)
+	optimal_path, order = a_star(maze, start, goal)
 
 	if an == 'y':
 		optimal_count = 0
