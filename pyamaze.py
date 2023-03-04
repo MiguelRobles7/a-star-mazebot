@@ -235,15 +235,26 @@ class maze:
 		self._win.state('zoomed')
 		self._win.title('PYTHON MAZE WORLD by Learning Orbis')
 		
-		scr_width=self._win.winfo_width()
-		scr_height=self._win.winfo_height()
+		scr_width=self._win.winfo_screenwidth()
+		scr_height=self._win.winfo_screenheight()
 		self._win.geometry(f"{scr_width}x{scr_height}+0+0")
 		self._canvas = Canvas(width=scr_width, height=scr_height, bg=theme.value[0]) # 0,0 is top left corner
 		self._canvas.pack(expand=YES, fill=BOTH)
-		self._cell_width=round(min(
-			(scr_height-2*self._LabWidth)/self.rows,
-			(scr_width-2*self._LabWidth)/self.cols
-			),3)
+		# Some calculations for calculating the width of the maze cell
+		k=3.25
+		if self.rows>=95 and self.cols>=95:
+			k=0
+		elif self.rows>=80 and self.cols>=80:
+			k=1
+		elif self.rows>=70 and self.cols>=70:
+			k=1.5
+		elif self.rows>=50 and self.cols>=50:
+			k=2
+		elif self.rows>=35 and self.cols>=35:
+			k=2.5
+		elif self.rows>=22 and self.cols>=22:
+			k=3
+		self._cell_width=round(min(((scr_height-self.rows-k*self._LabWidth)/(self.rows)),((scr_width-self.cols-k*self._LabWidth)/(self.cols)),90),3)
 
 	_tracePathList=[]
 	def _tracePathSingle(self,a: agent,p,delay):
