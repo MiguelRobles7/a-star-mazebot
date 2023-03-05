@@ -1,5 +1,11 @@
 from app import a_star, init_maze, TileType
 from pyamaze import maze, COLOR, agent, textLabel
+
+"""
+to run simply run app.py or gui.py,
+FAQs, Troubleshooting, and further instructions in the docs (report.pdf)
+"""
+
 def get_walls(m):
 	return [(ix,iy) for ix, row in enumerate(m) for iy, i in enumerate(row) if i == TileType.WALL]
 def main():

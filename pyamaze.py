@@ -1,4 +1,10 @@
 from app import TileType
+
+"""
+to run simply run app.py or gui.py,
+FAQs, Troubleshooting, and further instructions in the docs (report.pdf)
+"""
+
 """
 License
 https://www.youtube.com/c/LearningOrbis

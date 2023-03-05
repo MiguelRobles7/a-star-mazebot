@@ -3,6 +3,12 @@ from enum import Enum
 from collections import namedtuple
 import webbrowser
 import os
+
+"""
+to run simply run app.py or gui.py,
+FAQs, Troubleshooting, and further instructions in the docs (report.pdf)
+"""
+
 class TileType(Enum):
 	WALL = 0
 	EMPTY = 1
